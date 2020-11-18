@@ -1,26 +1,80 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app">
+    <button @click="toggleWindow">Add</button>
+    <table>
+      <tr>
+        <th>USD</th>
+        <th>RUB</th>
+        <th>UAH</th>
+        <th>Actions</th>
+      </tr>
+      <ItemsList
+        @clickedItem="getClickedItem"
+        @close-modal="toggleWindow"
+        :items="items"
+      />
+    </table>
+    <div class="modalWindow">
+      <CurrencyModal
+        :clickedItem="clickedItem"
+        v-if="open"
+        @close-modal="toggleWindow"
+        @data-update="updateDate"
+        @data-update-clicked-item="getClickedItem"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import ItemsList from '@/components/ItemsList'
+import CurrencyModal from '@/components/CurrencyModal'
 export default {
   name: 'App',
+  data() {
+    return {
+      items: JSON.parse(localStorage.getItem('items') || '[]'),
+      open: false,
+      clickedItem: ''
+    }
+  },
+
+  methods: {
+    addItem(event) {
+      let newItem = {
+        usd: '1',
+        rub: '2',
+        uah: '3'
+      }
+      this.items.push(newItem);
+      localStorage.setItem('items', JSON.stringify(this.items))
+    },
+
+    toggleWindow() {
+      this.open = !this.open;
+      this.clickedItem = ''
+    },
+
+    updateDate() {
+      this.items = JSON.parse(localStorage.getItem('items')) ? JSON.parse(localStorage.getItem('items')) : []
+    },
+
+    getClickedItem(value) {
+      this.clickedItem = this.clickedItem ? '' : value
+    }
+  },
+
   components: {
-    HelloWorld
+    ItemsList,
+    CurrencyModal,
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
+table, th, td {
+  border: 1px solid black;
 }
+
 </style>
